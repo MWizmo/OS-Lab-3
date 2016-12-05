@@ -10,25 +10,43 @@ using namespace std;
 
 stack <int> x;
 mutex mut;
+bool is_something_changed = false;
 
 class Producer {
 private:
-	int speed=1500;
-	bool condition=true;
+	int speed=2;
+	bool condition=false;
 public:
+	void Info() {
+		HANDLE hCon; COORD cPos;
+		hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+		cPos.Y = 7;
+		cPos.X = 0;
+		SetConsoleCursorPosition(hCon, cPos);
+		cout << "Скорость работы производителя:                                                                   ";
+		cPos.Y = 7;
+		SetConsoleCursorPosition(hCon, cPos);
+		cout << "Скорость работы производителя: " << speed << "   Статус производителя: ";
+		condition ? cout << "работает" : cout << "остановлен";
+	}
 	void Turn_Off() {
 		condition = false;
+		is_something_changed = true;
 	}
 	void Turn_On() {
 		condition = true;
+		is_something_changed = true;
 	}
 	void Change_Speed() {
+		//Turn_Off();
 		int _speed;
 		system("cls");
 		cout << "Введите необходимую скорость работы(от 0 до 10 секунд)>>";
 		cin >> _speed;
 		speed = _speed;
+		is_something_changed = true;
 		system("cls");
+		//condition = true;
 		Menu();
 	}
 	void Work() {
@@ -39,8 +57,8 @@ public:
 					keypress = _getch();
 					switch (keypress) {
 					case '1': {Change_Speed(); } break;
-					case '3': {condition = true; } break;
-					case '4': {condition = false; } break;
+					case '3': {condition = true; is_something_changed = true; } break;
+					case '4': {condition = false; is_something_changed = true; } break;
 					case '7': exit(0);
 					default: {} break;
 					}
@@ -51,21 +69,30 @@ public:
 						keypress = _getch();
 						switch (keypress) {
 						case '1': {Change_Speed(); } break;
-						case '3': {condition = true; } break;
-						case '4': {condition = false; } break;
+						case '3': {condition = true; is_something_changed = true; } break;
+						case '4': {condition = false; is_something_changed = true; } break;
 						case '7': exit(0);
 						default: {} break;
 						}
 					}
+					HANDLE hCon; COORD cPos;
+					hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+					cPos.Y = 11;
+					SetConsoleCursorPosition(hCon, cPos);
 					cout << "1! ";
 					mut.unlock();
-					this_thread::sleep_for(chrono::milliseconds(1000));
+					this_thread::sleep_for(chrono::seconds(1));
 					mut.lock();
 				}
+				HANDLE hCon; COORD cPos;
+				hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+				cPos.Y = 11;
+				SetConsoleCursorPosition(hCon, cPos);
 				cout << "1 ";
 				x.push(1);
+				is_something_changed = true;
 				mut.unlock();
-				this_thread::sleep_for(chrono::milliseconds(speed));
+				this_thread::sleep_for(chrono::seconds(speed));
 			}
 		}
 	}
@@ -73,22 +100,38 @@ public:
 
 class Consumer {
 private:
-	int speed=2000;
-	bool condition=true;
+	int speed=3;
+	bool condition=false;
 public:
+	void Info() {
+		HANDLE hCon; COORD cPos;
+		hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+		cPos.Y = 8;
+		cPos.X = 0;
+		SetConsoleCursorPosition(hCon, cPos);
+		cout << "Скорость работы потребителя:                                                                       ";
+		cPos.Y = 8;
+		SetConsoleCursorPosition(hCon, cPos);
+		cout << "Скорость работы потребителя: " << speed << "   Статус потребителя: ";
+		condition ? cout << "работает" : cout << "остановлен";
+	}
 	void Turn_Off() {
 		condition = false;
+		is_something_changed = true;
 	}
 	void Turn_On() {
-		condition = true;
+		condition = true; is_something_changed = true;
 	}
 	void Change_Speed() {
+		//condition = false;
 		int _speed;
 		system("cls");
 		cout << "Введите необходимую скорость работы(от 0 до 10 секунд)>>";
 		cin >> _speed;
 		speed = _speed;
+		is_something_changed = true;
 		system("cls");
+		//condition = true;
 		Menu();
 	}
 	void Work() {
@@ -98,9 +141,10 @@ public:
 				if (_kbhit()) {
 					keypress = _getch();
 					switch (keypress) {
+					//case'1':{}
 					case '2': {Change_Speed(); }break;
-					case '5': {condition = true; } break;
-					case '6': {condition = false; } break;
+					case '5': {condition = true; is_something_changed = true; } break;
+					case '6': {condition = false; is_something_changed = true; } break;
 					case '7': exit(0);
 					default: {} break;
 					}
@@ -110,38 +154,36 @@ public:
 					if (_kbhit()) {
 						keypress = _getch();
 						switch (keypress) {
+						case '1':{}
 						case '2': {Change_Speed(); }break;
-						case '5': {condition = true; } break;
-						case '6': {condition = false; } break;
+						case '5': {condition = true; is_something_changed = true; } break;
+						case '6': {condition = false; is_something_changed = true; } break;
 						case '7': exit(0);
 						default: {} break;
 						}
 					}
+					HANDLE hCon; COORD cPos;
+					hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+					cPos.Y = 11;
+					SetConsoleCursorPosition(hCon, cPos);
 					cout << "2! ";
 					mut.unlock();
-					this_thread::sleep_for(chrono::milliseconds(1000));
+					this_thread::sleep_for(chrono::seconds(1));
 					mut.lock();
 				}
+				HANDLE hCon; COORD cPos;
+				hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+				cPos.Y = 11;
+				SetConsoleCursorPosition(hCon, cPos);
 				cout << "2 ";
 				x.pop();
+				is_something_changed = true;
 				mut.unlock();
-				this_thread::sleep_for(chrono::milliseconds(speed));
+				this_thread::sleep_for(chrono::seconds(speed));
 			}
 		}
 	}
 };
-
-void Print(stack<int> a) {
-	if (a.empty())
-		cout << "Стек пуст" << endl;
-	else {
-		while (!a.empty()) {
-			cout << a.top() << " ";
-			a.pop();
-		}
-		cout << endl;
-	}
-}
 
 void HideCursor() {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -151,19 +193,40 @@ void HideCursor() {
 	SetConsoleCursorInfo(out, &cursorInfo);
 }
 
+void Info(Consumer cons, Producer prod) {
+	HANDLE hCon; COORD cPos;
+	hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+	cPos.Y = 6;
+	cPos.X = 0;
+	SetConsoleCursorPosition(hCon, cPos);
+	cout << "Занятость стека:             ";
+	cPos.Y = 6;
+	SetConsoleCursorPosition(hCon, cPos);
+	cout << "Занятость стека: " << x.size() << "/10\n";
+	prod.Info();
+	cons.Info();
+	cout << endl;
+	is_something_changed = false;
+}
+
 void Menu() {
 	Consumer Cons;
 	Producer Prod;
-	cout << "1)Установить скорость для производителя\n2)Установить скорость для потребителя\n3)Запустить производителя\n4)Приостановить производителя\n5)Запустить потребителя\n6)Приостановить работу потребителя\n7)Выйти из программы\n";
+	cout << "1)Установить скорость для производителя  2)Установить скорость для потребителя\n3)Запустить производителя                4)Приостановить производителя\n5)Запустить потребителя                  6)Приостановить работу потребителя\n7)Выйти из программы\n";
+	Info(Cons, Prod);
 	HANDLE hCon; COORD cPos;
 	hCon = GetStdHandle(STD_OUTPUT_HANDLE);
-	cPos.Y = 9;
-	cPos.X = 0;
-	SetConsoleCursorPosition(hCon, cPos);
 	char keypress;
 	thread thr1([&Cons]() {Cons.Work(); });
 	thread thr2([&Prod]() {Prod.Work(); });
+	cPos.Y = 12;
+	cPos.X = 0;
+	SetConsoleCursorPosition(hCon, cPos);
 	for (;;) {
+		if (is_something_changed) {
+			Info(Cons, Prod);
+			is_something_changed = false;
+		}
 		if (_kbhit()) {
 			keypress = _getch();
 			switch (keypress) {
